@@ -115,6 +115,7 @@ export const connectWallet = async () => {
       }
     }
 
+  // eslint-disable-next-line 
     //make metadata
     const metadata = new Object();
     metadata.name = name;
@@ -184,6 +185,7 @@ export const mintNFTPolygon = async(url, name, description) => {
     }
   }
 
+  // eslint-disable-next-line 
   //make metadata
   const metadata = new Object();
   metadata.name = name;
@@ -252,7 +254,7 @@ export const mintNFTBsc = async(url, name, description) => {
       status: "❗Please insert the description field",
     }
   }
-
+  // eslint-disable-next-line 
   //make metadata
   const metadata = new Object();
   metadata.name = name;
