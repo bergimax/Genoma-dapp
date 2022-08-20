@@ -1,4 +1,5 @@
 import {pinJSONToIPFS} from './pinata.js';
+import { Network, Alchemy } from 'alchemy-sdk';
 require('dotenv').config();
 const alchemyKey = process.env.REACT_APP_ALCHEMY_KEY;
 const contractABI = require('../contract-abi.json')
@@ -9,6 +10,7 @@ const web3 = createAlchemyWeb3(alchemyKey);
 //test
 
 const contractAddressPolygon = "0x9FFC181dB161fa1451E174598F764BC280944dC5";
+const contractAddressBsc = "0xAd44a3601E781f077934434Ca1c60e9Ae15B822C";
 const alchemyKeyP = process.env.REACT_APP_POLYGON_ALCHEMY_KEY;
 const web3p = createAlchemyWeb3(alchemyKeyP);
 const contractABIPolygon = require('../contract-Polygon-abi')
@@ -169,11 +171,25 @@ export const connectWallet = async () => {
 export const mintNFTPolygon = async(url, name, description) => {
 
   //error handling
-  if (url.trim() == "" || (name.trim() == "" || description.trim() == "")) {
-      return {
-          success: false,
-          status: "❗Please make sure all fields are completed before minting.",
-      }
+  if (url.trim() == "") {
+    return {
+      success: false,
+      status: "❗Please insert the hash of the url",
+    }
+  }
+
+  if (name.trim() == "") {
+    return {
+      success: false,
+      status: "❗Please insert the name of your NFT",
+    }
+  }
+
+  if (description.trim() == "") {
+    return {
+      success: false,
+      status: "❗Please insert the description field",
+    }
   }
 
   //make metadata
@@ -193,13 +209,13 @@ export const mintNFTPolygon = async(url, name, description) => {
   const tokenURI = pinataResponse.pinataUrl;
 
   //load smart contract
-  window.contract = await new web3p.eth.Contract(contractABIPolygon, contractAddressPolygon);//loadContract();
+  window.contract = await new web3.eth.Contract(contractABI, contractAddressPolygon);//loadContract();
 
-  //set up your Polygon transaction
-  const transactionParametersPolygon = {
+  //set up your Ethereum transaction
+  const transactionParameters = {
       to: contractAddressPolygon, // Required except during contract publications.
       from: window.ethereum.selectedAddress, // must match user's active address.
-      'data': window.contract.methods.mintNFTPolygon(window.ethereum.selectedAddress, tokenURI).encodeABI() //make call to NFT smart contract
+      'data': window.contract.methods.mintNFT(window.ethereum.selectedAddress, tokenURI).encodeABI() //make call to NFT smart contract
   };
 
   //sign transaction via Metamask
@@ -207,11 +223,80 @@ export const mintNFTPolygon = async(url, name, description) => {
       const txHash = await window.ethereum
           .request({
               method: 'eth_sendTransaction',
-              params: [transactionParametersPolygon],
+              params: [transactionParameters],
           });
       return {
           success: true,
-          status: "✅ Check out your transaction on PolygonScan: https://mumbai.polygonscan.com/address/" + txHash
+          status: "✅ Check out your transaction on Polygonscan: https://mumbai.polygonscan.com/tx/" + txHash
+      }
+  } catch (error) {
+      return {
+          success: false,
+          status: "😥 Something went wrong: " + error.message
+      }
+  }
+}
+
+export const mintNFTBsc = async(url, name, description) => {
+
+  //error handling
+  if (url.trim() == "") {
+    return {
+      success: false,
+      status: "❗Please insert the hash of the url",
+    }
+  }
+
+  if (name.trim() == "") {
+    return {
+      success: false,
+      status: "❗Please insert the name of your NFT",
+    }
+  }
+
+  if (description.trim() == "") {
+    return {
+      success: false,
+      status: "❗Please insert the description field",
+    }
+  }
+
+  //make metadata
+  const metadata = new Object();
+  metadata.name = name;
+  metadata.image = url;
+  metadata.description = description;
+
+  //pinata pin request
+  const pinataResponse = await pinJSONToIPFS(metadata);
+  if (!pinataResponse.success) {
+      return {
+          success: false,
+          status: "😢 Something went wrong while uploading your tokenURI.",
+      }
+  }
+  const tokenURI = pinataResponse.pinataUrl;
+
+  //load smart contract
+  window.contract = await new web3.eth.Contract(contractABI, contractAddressBsc);//loadContract();
+
+  //set up your Ethereum transaction
+  const transactionParameters = {
+      to: contractAddressBsc, // Required except during contract publications.
+      from: window.ethereum.selectedAddress, // must match user's active address.
+      'data': window.contract.methods.mintNFT(window.ethereum.selectedAddress, tokenURI).encodeABI() //make call to NFT smart contract
+  };
+
+  //sign transaction via Metamask
+  try {
+      const txHash = await window.ethereum
+          .request({
+              method: 'eth_sendTransaction',
+              params: [transactionParameters],
+          });
+      return {
+          success: true,
+          status: "✅ Check out your transaction on Bscscan: https://testnet.bscscan.com/tx/" + txHash
       }
   } catch (error) {
       return {
