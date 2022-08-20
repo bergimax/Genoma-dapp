@@ -1,5 +1,4 @@
 import {pinJSONToIPFS} from './pinata.js';
-import { Network, Alchemy } from 'alchemy-sdk';
 require('dotenv').config();
 const alchemyKey = process.env.REACT_APP_ALCHEMY_KEY;
 const contractABI = require('../contract-abi.json')
@@ -11,9 +10,6 @@ const web3 = createAlchemyWeb3(alchemyKey);
 
 const contractAddressPolygon = "0x9FFC181dB161fa1451E174598F764BC280944dC5";
 const contractAddressBsc = "0xAd44a3601E781f077934434Ca1c60e9Ae15B822C";
-const alchemyKeyP = process.env.REACT_APP_POLYGON_ALCHEMY_KEY;
-const web3p = createAlchemyWeb3(alchemyKeyP);
-const contractABIPolygon = require('../contract-Polygon-abi')
 
 export const connectWallet = async () => {
     if (window.ethereum) { 
@@ -93,10 +89,6 @@ export const connectWallet = async () => {
 
   async function loadContract() {
     return new web3.eth.Contract(contractABI, contractAddress);
-  }
-  
-  async function loadContractP() {
-    return new web3p.eth.Contract(contractABI, contractAddressPolygon);
   }
   
   export const mintNFT = async(url, name, description) => {
