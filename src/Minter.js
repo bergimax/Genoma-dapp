@@ -30,7 +30,44 @@ const Minter = (props) => {
 };
 
 const onPolygonMintPressed = async () => {
+  const { status } = await mintNFTPolygon(url, name, description);import { useEffect, useState } from "react";
+import { connectWallet, getCurrentWalletConnected, mintNFT, mintNFTBsc, mintNFTPolygon } from "./utils/interact.js";
+
+const Minter = (props) => {
+
+  //State variables
+  const [walletAddress, setWallet] = useState("");
+  const [status, setStatus] = useState("");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [url, setURL] = useState("");
+
+  useEffect(async () => {
+    const {address, status} = await getCurrentWalletConnected();
+    setWallet(address)
+    setStatus(status);
+
+    addWalletListener();
+  }, []);
+ 
+  const connectWalletPressed = async () => {
+    const walletResponse = await connectWallet();
+    setStatus(walletResponse.status);
+    setWallet(walletResponse.address);
+  };
+
+  const onMintPressed = async () => {
+    const { status } = await mintNFT(url, name, description);
+    setStatus(status);
+};
+
+const onPolygonMintPressed = async () => {
   const { status } = await mintNFTPolygon(url, name, description);
+  setStatus(status);
+};
+
+const onBscMintPressed = async () => {
+  const { status } = await mintNFTBsc(url, name, description);
   setStatus(status);
 };
 
@@ -101,7 +138,7 @@ function addWalletListener() {
         Mint NFT on ETH
       </button> 
       <br></br>
-      <button id="mintButtonBSC" onClick={onMintPressed}>
+      <button id="mintButtonBSC" onClick={onBscMintPressed}>
         Mint NFT on BSC
       </button>
       <br></br>
