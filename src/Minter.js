@@ -1,36 +1,4 @@
 import { useEffect, useState } from "react";
-import { connectWallet, getCurrentWalletConnected, mintNFT, mintNFTPolygon } from "./utils/interact.js";
-
-const Minter = (props) => {
-
-  //State variables
-  const [walletAddress, setWallet] = useState("");
-  const [status, setStatus] = useState("");
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [url, setURL] = useState("");
-
-  useEffect(async () => {
-    const {address, status} = await getCurrentWalletConnected();
-    setWallet(address)
-    setStatus(status);
-
-    addWalletListener();
-  }, []);
- 
-  const connectWalletPressed = async () => {
-    const walletResponse = await connectWallet();
-    setStatus(walletResponse.status);
-    setWallet(walletResponse.address);
-  };
-
-  const onMintPressed = async () => {
-    const { status } = await mintNFT(url, name, description);
-    setStatus(status);
-};
-
-const onPolygonMintPressed = async () => {
-  const { status } = await mintNFTPolygon(url, name, description);import { useEffect, useState } from "react";
 import { connectWallet, getCurrentWalletConnected, mintNFT, mintNFTBsc, mintNFTPolygon } from "./utils/interact.js";
 
 const Minter = (props) => {
